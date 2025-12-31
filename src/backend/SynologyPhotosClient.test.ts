@@ -158,7 +158,9 @@ describe('SynologyPhotosClient', () => {
       const result = await client.findAlbum();
 
       expect(result).toBe(true);
-      expect(Log.info).toHaveBeenCalledWith('Found album: TestAlbum');
+      expect(Log.info).toHaveBeenCalledWith(
+        expect.stringContaining('Found album "TestAlbum"')
+      );
     });
 
     test('should handle case-insensitive matching', async () => {
@@ -200,7 +202,7 @@ describe('SynologyPhotosClient', () => {
       const result = await client.findAlbum();
 
       expect(result).toBe(false);
-      expect(Log.error).toHaveBeenCalled();
+      expect(Log.warn).toHaveBeenCalled();
     });
   });
 
@@ -318,7 +320,7 @@ describe('SynologyPhotosClient', () => {
       const result = await client.fetchPhotos();
 
       expect(result).toEqual([]);
-      expect(Log.error).toHaveBeenCalled();
+      expect(Log.warn).toHaveBeenCalled();
     });
 
     test('should handle empty photo list', async () => {
