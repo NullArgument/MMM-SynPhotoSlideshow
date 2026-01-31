@@ -100,6 +100,7 @@ class ImageProcessor {
       }
 
       Log.debug('Downloading Synology image...');
+      Log.debug(`imageUrl: ${imageUrl}`);
       const imageBuffer = await synologyClient.downloadPhoto(imageUrl);
 
       if (imageBuffer) {

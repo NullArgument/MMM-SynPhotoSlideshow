@@ -27,7 +27,7 @@ class Logger {
     if (!this._log) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        this._log = require('logger') as LoggerInterface;
+        this._log = require('../../../js/logger.js') as LoggerInterface;
       } catch {
         // Fallback to console if logger not available (e.g., in tests)
         this._log = console;
@@ -46,19 +46,6 @@ class Logger {
       return message;
     }
     return `${LOG_PREFIX} ${message}`;
-  }
-
-  /**
-   * Check if a log method is enabled (not replaced by setLogLevel with empty function)
-   * @private
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  private _isMethodEnabled(method: Function): boolean {
-    // When setLogLevel disables a method, it replaces it with: function () {}
-    // We can detect this by checking the function's string representation
-    const funcStr = method.toString();
-    // Empty stub functions are very short and contain only "function () {}"
-    return funcStr.length > 25 || funcStr.includes('native code');
   }
 
   /**
@@ -86,22 +73,14 @@ class Logger {
    * Log debug message
    */
   debug(message: string, ...args: unknown[]): void {
-    const logger = this._getLogger();
-    // Only log if the debug method hasn't been disabled by setLogLevel
-    if (this._isMethodEnabled(logger.debug)) {
-      logger.debug(this._formatMessage(message), ...args);
-    }
+    this._getLogger().debug(this._formatMessage(message), ...args);
   }
 
   /**
-   * Log general message (LOG level)
+   * Log general message
    */
   log(message: string, ...args: unknown[]): void {
-    const logger = this._getLogger();
-    // Only log if the log method hasn't been disabled by setLogLevel
-    if (this._isMethodEnabled(logger.log)) {
-      logger.log(this._formatMessage(message), ...args);
-    }
+    this._getLogger().log(this._formatMessage(message), ...args);
   }
 }
 

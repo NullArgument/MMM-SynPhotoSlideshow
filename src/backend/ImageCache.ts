@@ -226,6 +226,11 @@ class ImageCache {
       }
 
       const filePath = path.join(this.cacheDir, key);
+
+      Log.debug(`filepath = ${filePath}`);
+      Log.debug(`cacheDir = ${this.cacheDir}`);
+      Log.debug(`key      = ${key}`);
+      
       try {
         await fsPromises.access(filePath);
         const data = await fsPromises.readFile(filePath, 'utf8');

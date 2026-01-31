@@ -93,6 +93,8 @@ class SynologyPhotosClient {
     }
 
     try {
+      Log.debug(`baseUrl    : ${this.baseUrl}`);
+      Log.debug(`authApiPath: ${this.authApiPath}`);
       const response = await axios.get(`${this.baseUrl}${this.authApiPath}`, {
         params: {
           api: 'SYNO.API.Auth',
@@ -107,6 +109,7 @@ class SynologyPhotosClient {
       });
 
       if (response.data.success) {
+        Log.debug(`response: ${JSON.stringify(response.data)}`);
         this.sid = response.data.data.sid;
         Log.info('Successfully authenticated with Synology');
         return true;
@@ -164,6 +167,11 @@ class SynologyPhotosClient {
       params,
       timeout: 10000
     });
+
+    Log.debug(`findAlbumsInSpace()`);
+    Log.debug(`baseUrl      : ${this.baseUrl}`);
+    Log.debug(`photosApiPath: ${this.photosApiPath}`);
+    Log.debug(`params       : ${JSON.stringify(params)}`);
 
     if (!response.data.success) {
       Log.warn(`Failed to list albums in ${space.name} space`);
@@ -545,11 +553,16 @@ class SynologyPhotosClient {
         timeout: 30000
       });
 
+      Log.debug(`baseUrl      : ${this.baseUrl}`);
+      Log.debug(`photosApiPath: ${this.photosApiPath}`);
+      Log.debug(`params       : ${JSON.stringify(params)}`);
+
       if (response.data.success) {
         const photos = response.data.data.list;
         Log.info(
           `Fetched ${photos.length} photos from space ${spaceId} using ${api}`
         );
+        Log.debug(`photos: ${JSON.stringify(photos)}`);
         return this.processPhotoList(photos, spaceId);
       }
       Log.warn(
@@ -703,8 +716,13 @@ class SynologyPhotosClient {
         continue;
       }
 
-      const imageUrl = this.getPhotoUrl(
+      Log.debug(`processPhotoList`);
+      Log.debug(`id       : ${photo.id}`);
+      Log.debug(`unit_id  : ${photo.additional?.thumbnail?.unit_id}`)
+      Log.debug(`cache_key: ${photo.additional?.thumbnail?.cache_key}`);
+
         //photo.id,
+      const imageUrl = this.getPhotoUrl(
         photo.additional?.thumbnail?.unit_id,
         photo.additional?.thumbnail?.cache_key,
         spaceId
@@ -742,6 +760,10 @@ class SynologyPhotosClient {
     let url: string;
     const quotedCacheKey = `"${cacheKey}"`;
 
+    Log.debug("getPhotoUrl()");
+    Log.debug(`photoId : ${photoId}`);
+    Log.debug(`cacheKey: ${cacheKey}`);
+
     if (this.useSharedAlbum) {
       url = `${this.baseUrl}${this.photosApiPath}?api=SYNO.Foto.Thumbnail&version=2&method=get&id=${photoId}&cache_key=${quotedCacheKey}&type="unit"&size="xl"&passphrase=${this.shareToken}`;
     } else {
@@ -762,6 +784,7 @@ class SynologyPhotosClient {
    */
   async downloadPhoto(photoUrl: string): Promise<Buffer | null> {
     try {
+      Log.debug(`photoUrl: ${photoUrl}`);
       const response = await axios.get(photoUrl, {
         responseType: 'arraybuffer',
         timeout: 30000
