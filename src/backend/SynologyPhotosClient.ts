@@ -22,6 +22,7 @@ interface SynologyPhoto {
   additional?: {
     thumbnail?: {
       cache_key?: string;
+      unit_id?: number;
     };
   };
 }
@@ -703,7 +704,8 @@ class SynologyPhotosClient {
       }
 
       const imageUrl = this.getPhotoUrl(
-        photo.id,
+        //photo.id,
+        photo.additional?.thumbnail?.unit_id,
         photo.additional?.thumbnail?.cache_key,
         spaceId
       );
